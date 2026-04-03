@@ -1,0 +1,9 @@
+CREATE TABLE suppliers (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    code VARCHAR(50) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255),
+    address TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_supplier_code UNIQUE (code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

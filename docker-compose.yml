@@ -1,0 +1,32 @@
+services:
+  procurement-db:
+    image: mysql:8.0 # atau postgres sesuai pilihanmu
+    container_name: procurement-db
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - MYSQL_DATABASE=procurement_db
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  procurement-service:
+    build:
+      context: .
+      # dockerfile: src/main/docker/Dockerfile.jvm
+      dockerfile: src/main/docker/Dockerfile.native
+    container_name: procurement-service
+    environment:
+      - QUARKUS_PROFILE=prod
+      - QUARKUS_DATASOURCE_JDBC_URL=jdbc:mysql://procurement-db:3306/procurement_db
+      - QUARKUS_DATASOURCE_USERNAME=root
+      - QUARKUS_DATASOURCE_PASSWORD=rootpassword
+      # Config untuk konek ke Audit Service (Go) via gRPC
+      - QUARKUS_GRPC_CLIENTS_AUDIT_HOST=audit-service 
+    ports:
+      - "8080:8080"
+    depends_on:
+      - procurement-db

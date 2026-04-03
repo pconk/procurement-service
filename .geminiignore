@@ -1,0 +1,13 @@
+# Folder build & dependencies
+target/
+.mvn/
+bin/
+*.class
+
+# File IDE
+.idea/
+.vscode/
+*.iml
+
+# File Quarkus khusus
+.quarkus/

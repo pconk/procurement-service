@@ -1,0 +1,26 @@
+package com.pconk.procurement.infrastructure.entrypoint;
+
+import jakarta.inject.Inject;
+
+import com.pconk.procurement.api.grpc.*;
+
+import io.quarkus.grpc.GrpcService;
+
+import io.smallrye.mutiny.Uni;
+
+@GrpcService
+public class ProcurementGrpcServer extends ProcurementServiceImplBase {
+
+    @Inject
+    ProcurementService createOrderUseCase;
+
+    @Override
+    public Uni<ProcurementResponse> createOrder(ProcurementRequest request) {
+        var result = createOrderUseCase.execute(request.getItemId(), request.getQuantity());
+
+        return Uni.createFrom().item(ProcurementResponse.newBuilder()
+                .setOrderId(result.getId())
+                .setStatus("SUCCESS")
+                .build());
+    }
+}

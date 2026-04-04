@@ -2,6 +2,7 @@ package com.pconk.procurement.domain.entity;
 
 import jakarta.persistence.*;
 // import jakarta.validation.constraints.NotBlank;
+import java.time.LocalDateTime;
 import jakarta.validation.constraints.Email;
 
 @Entity
@@ -23,4 +24,7 @@ public class Supplier {
     public String email;
 
     public String address;
+
+    @Column(name = "deleted_at")
+    public LocalDateTime deletedAt;
 }

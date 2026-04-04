@@ -1,10 +1,19 @@
+### Global Variables
 @baseUrl = http://localhost:8080
+@requestId = {{ $guid }}
 @contentType = application/json
-@requestID = "requestid-1"
+
+### 1. Get All Suppliers (Pagination)
+GET {{baseUrl}}/suppliers?page=0&size=10
+X-Request-ID: {{requestId}}
+
+### 2. Get Supplier by ID
+GET {{baseUrl}}/suppliers/2
+X-Request-ID: {{requestId}}
 
 ### Create New Supplier
 POST {{baseUrl}}/suppliers
-X-Request-ID: {{requestID}}
+X-Request-ID: {{requestId}}
 Content-Type: {{contentType}}
 
 {
@@ -14,54 +23,67 @@ Content-Type: {{contentType}}
   "address": "Kawasan Industri Jababeka Blok C-12"
 }
 
-### Get All Suppliers WO reqeuest-id (Paginated)
-GET {{baseUrl}}/suppliers?page=0&size=10
-Accept: {{contentType}}
-
-### Get All Suppliers (Paginated)
-GET {{baseUrl}}/suppliers?page=0&size=10
-X-Request-ID: {{requestID}}
-Accept: {{contentType}}
-
-### Get Supplier By ID
-# Ganti angka '1' dengan ID yang didapat dari hasil Create/List
-GET {{baseUrl}}/suppliers/1
-X-Request-ID: {{requestID}}
-Accept: {{contentType}}
-
-### Update Supplier
-PUT {{baseUrl}}/suppliers/1
-X-Request-ID: {{requestID}}
-Content-Type: {{contentType}}
-
-{
-  "code": "VEND-001",
-  "name": "PT. Elektronik Maju Jaya (Updated) 2",
-  "email": "support@maju-jaya.co.id",
-  "address": "Kawasan Industri Jababeka Blok C-12, Bekasi"
-}
-
-### Delete Supplier
-DELETE {{baseUrl}}/suppliers/1
-X-Request-ID: {{requestID}}
-
-### Validation Test: Create with Invalid Email (Will return 400)
+### Validataion Test
 POST {{baseUrl}}/suppliers
-X-Request-ID: {{requestID}}
+X-Request-ID: {{requestId}}
 Content-Type: {{contentType}}
 
 {
   "code": "VEND-002",
-  "name2": "Supplier Error",
-  "email": "email-tidak-valid",
-  "address": "Alamat Palsu"
+  "name2": "PT. Angin Ribut",
+  "email": "salesangin-ribut.com",
+  "address": "Kawasan Industri Jababeka Blok C-13"
 }
 
-### Validation Test: Create with Empty Name (Will return 400)
-POST {{baseUrl}}/suppliers
-X-Request-ID: {{requestID}}
+### Delete Supplier
+DELETE  {{baseUrl}}/suppliers/2
+X-Request-ID: {{requestId}}
 Content-Type: {{contentType}}
 
+
+
+### 3. Create Purchase Order (Draft)
+# Pastikan supplierId 1 sudah ada di database sebelum menjalankan ini
+POST {{baseUrl}}/purchase-orders
+Content-Type: {{contentType}}
+X-Request-ID: {{requestId}}
+
 {
-  "code": "VEND-003"
+  "supplierId": 2,
+  "items": [
+    {
+      "itemId": 101,
+      "quantity": 10,
+      "price": 15000.00
+    },
+    {
+      "itemId": 102,
+      "quantity": 5,
+      "price": 25500.50
+    }
+  ]
+}
+
+### 4. Get Purchase Order by ID
+# Ganti ID '1' dengan ID yang didapat dari response POST di atas
+GET {{baseUrl}}/purchase-orders/2
+X-Request-ID: {{requestId}}
+
+### 5. Create PO with Invalid Supplier (Error Handling Test)
+POST {{baseUrl}}/purchase-orders
+Content-Type: {{contentType}}
+X-Request-ID: {{requestId}}
+
+{
+  "supplierId": 9999,
+  "items": []
+}
+
+### 6. Update status PO
+PUT {{baseUrl}}/purchase-orders/update-status/2
+Content-Type: {{contentType}}
+X-Request-ID: {{requestId}}
+
+{
+  "status": "DRAFT"
 }

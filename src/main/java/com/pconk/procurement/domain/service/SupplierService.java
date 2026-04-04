@@ -12,6 +12,7 @@ import jakarta.transaction.Transactional;
 import io.quarkus.panache.common.Page;
 import org.jboss.logging.Logger;
 import java.util.List;
+import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
@@ -25,17 +26,17 @@ public class SupplierService {
     SupplierRepository supplierRepository;
 
     public PagedResponse<SupplierDTO> getAllSuppliers(int page, int size) {
-        List<SupplierDTO> dtos = supplierRepository.findAll().page(Page.of(page, size))
+        List<SupplierDTO> dtos = supplierRepository.find("deletedAt is null").page(Page.of(page, size))
                 .list().stream()
                 .map(supplierMapper::toDTO)
                 .collect(Collectors.toList());
         
-        long total = supplierRepository.count();
+        long total = supplierRepository.count("deletedAt is null");
         return new PagedResponse<>(dtos, total, page, size);
     }
 
     public SupplierDTO getSupplierById(Long id) {
-        Supplier supplier = supplierRepository.findById(id);
+        Supplier supplier = supplierRepository.findActiveById(id).orElse(null);
         if (supplier == null) {
             LOG.warnf("Supplier lookup failed. ID %d not found", id);
             throw new NotFoundException("Supplier with ID " + id + " not found");
@@ -57,7 +58,7 @@ public class SupplierService {
 
     @Transactional
     public SupplierDTO updateSupplier(Long id, SupplierDTO supplierDTO) {
-        Supplier entity = supplierRepository.findById(id);
+        Supplier entity = supplierRepository.findActiveById(id).orElse(null);
         if (entity == null) {
             LOG.warnf("Update failed. Supplier ID %d not found", id);
             throw new NotFoundException("Supplier not found");
@@ -73,11 +74,13 @@ public class SupplierService {
 
     @Transactional
     public boolean deleteSupplier(Long id) {
-        boolean deleted = supplierRepository.deleteById(id);
-        if (!deleted) {
+        Supplier entity = supplierRepository.findActiveById(id).orElse(null);
+        if (entity == null) {
             LOG.warnf("Delete failed. Supplier ID %d not found", id);
             throw new NotFoundException("Supplier not found");
         }
+        
+        entity.deletedAt = LocalDateTime.now();
         LOG.infof("Supplier ID %d deleted successfully", id);
         return true;
     }

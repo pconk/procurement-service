@@ -28,3 +28,4 @@ jobs:
         run: ./mvnw -B verify
         env:
           QUARKUS_HIBERNATE_ORM_DATABASE_GENERATION: none
+          QUARKUS_FLYWAY_ENABLED: false

@@ -1,5 +1,0 @@
-package com.pconk.procurement.infrastructure.repository;
-
-public interface ProcurementRepository {
-    
-}

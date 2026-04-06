@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package com.pconk.procurement.v1;
+
+option java_multiple_files = true;
+option java_package = "com.pconk.procurement.v1";
+option java_outer_classname = "ProcurementProto";
+
+service ProcurementService {
+  rpc UpdateStatusToReceived (UpdateStatusRequest) returns (UpdateStatusResponse);
+}
+
+message UpdateStatusRequest {
+  int64 po_id = 1;
+}
+
+message UpdateStatusResponse {
+  bool success = 1;
+}

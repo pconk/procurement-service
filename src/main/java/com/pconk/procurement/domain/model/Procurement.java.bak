@@ -1,8 +1,0 @@
-package com.pconk.procurement.domain.model;
-
-public class Procurement {
-    private String id;
-    private String itemId;
-    private Integer quantity;
-    // Getter, Setter, dan Logika Bisnis murni di sini
-}

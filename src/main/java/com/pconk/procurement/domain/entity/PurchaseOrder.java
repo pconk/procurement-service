@@ -2,6 +2,7 @@ package com.pconk.procurement.domain.entity;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +24,9 @@ public class PurchaseOrder {
 
     @Column(name = "total_amount")
     public BigDecimal totalAmount;
+
+    @Column(name = "stock_updated_at")
+    public LocalDateTime stockUpdatedAt;
 
     @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL, orphanRemoval = true)
     public List<PurchaseOrderItem> items = new ArrayList<>();

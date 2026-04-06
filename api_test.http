@@ -1,19 +1,25 @@
 ### Global Variables
-@baseUrl = http://localhost:8080
+@baseUrl = http://localhost:8083
 @requestId = {{ $guid }}
 @contentType = application/json
+# Token ini harus di-sign menggunakan secret: rahasia-super-aman
+# Payload: {"user_id":"1","username":"pconk","role":"admin"}
+@authToken = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NzU1NzIxNTYsImlzcyI6ImF1ZGl0LXNlcnZpY2UtdGVzdCIsInJvbGUiOiJhZG1pbiIsInVzZXJfaWQiOiIxIiwidXNlcm5hbWUiOiJhZG1pbl9ndWRhbmciLCJ3YXJlaG91c2VfaWQiOiJXSC1KS1QtMDk5In0.bsSUCiZ4B0tzGCfmzHmF6-cH1Q6WuIRQ5qgE3NdImqU
 
 ### 1. Get All Suppliers (Pagination)
 GET {{baseUrl}}/suppliers?page=0&size=10
 X-Request-ID: {{requestId}}
+Authorization: Bearer {{authToken}}
 
 ### 2. Get Supplier by ID
 GET {{baseUrl}}/suppliers/2
 X-Request-ID: {{requestId}}
+Authorization: Bearer {{authToken}}
 
 ### Create New Supplier
 POST {{baseUrl}}/suppliers
 X-Request-ID: {{requestId}}
+Authorization: Bearer {{authToken}}
 Content-Type: {{contentType}}
 
 {
@@ -26,6 +32,7 @@ Content-Type: {{contentType}}
 ### Validataion Test
 POST {{baseUrl}}/suppliers
 X-Request-ID: {{requestId}}
+Authorization: Bearer {{authToken}}
 Content-Type: {{contentType}}
 
 {
@@ -38,6 +45,7 @@ Content-Type: {{contentType}}
 ### Delete Supplier
 DELETE  {{baseUrl}}/suppliers/2
 X-Request-ID: {{requestId}}
+Authorization: Bearer {{authToken}}
 Content-Type: {{contentType}}
 
 
@@ -45,6 +53,7 @@ Content-Type: {{contentType}}
 ### 3. Create Purchase Order (Draft)
 # Pastikan supplierId 1 sudah ada di database sebelum menjalankan ini
 POST {{baseUrl}}/purchase-orders
+Authorization: Bearer {{authToken}}
 Content-Type: {{contentType}}
 X-Request-ID: {{requestId}}
 
@@ -68,9 +77,11 @@ X-Request-ID: {{requestId}}
 # Ganti ID '1' dengan ID yang didapat dari response POST di atas
 GET {{baseUrl}}/purchase-orders/2
 X-Request-ID: {{requestId}}
+Authorization: Bearer {{authToken}}
 
 ### 5. Create PO with Invalid Supplier (Error Handling Test)
 POST {{baseUrl}}/purchase-orders
+Authorization: Bearer {{authToken}}
 Content-Type: {{contentType}}
 X-Request-ID: {{requestId}}
 
@@ -81,6 +92,7 @@ X-Request-ID: {{requestId}}
 
 ### 6. Update status PO
 PUT {{baseUrl}}/purchase-orders/update-status/2
+Authorization: Bearer {{authToken}}
 Content-Type: {{contentType}}
 X-Request-ID: {{requestId}}
 

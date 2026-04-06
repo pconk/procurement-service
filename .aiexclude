@@ -11,3 +11,6 @@ bin/
 
 # File Quarkus khusus
 .quarkus/
+
+# mvnw
+mvnw*

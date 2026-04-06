@@ -24,9 +24,10 @@ services:
       - QUARKUS_DATASOURCE_JDBC_URL=jdbc:mysql://procurement-db:3306/procurement_db
       - QUARKUS_DATASOURCE_USERNAME=root
       - QUARKUS_DATASOURCE_PASSWORD=rootpassword
+      - QUARKUS_HTTP_PORT=8083
       # Config untuk konek ke Audit Service (Go) via gRPC
       - QUARKUS_GRPC_CLIENTS_AUDIT_HOST=audit-service 
     ports:
-      - "8080:8080"
+      - "8083:8083"
     depends_on:
       - procurement-db

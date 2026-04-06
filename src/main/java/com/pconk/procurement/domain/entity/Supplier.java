@@ -1,7 +1,7 @@
 package com.pconk.procurement.domain.entity;
 
 import jakarta.persistence.*;
-// import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
 import jakarta.validation.constraints.Email;
 
@@ -12,7 +12,7 @@ public class Supplier {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
-    // @NotBlank(message = "Kode supplier wajib diisi")
+    @NotBlank(message = "Kode supplier wajib diisi")
     @Column(unique = true, nullable = false)
     public String code;
 

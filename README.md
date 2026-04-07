@@ -22,7 +22,7 @@ Service ini mengimplementasikan standarisasi keamanan dan tracing yang kompatibe
 
 ### 1. JWT Authentication (HMAC-SHA256)
 - **Interceptor:** `HttpLoggingFilter` (REST) dan `GrpcHeaderInterceptor` (gRPC).
-- **Mekanisme:** Mengekstrak header `Authorization: Bearer <token>`, memvalidasi signature menggunakan `jwt.secret`, dan memetakan claims (`user_id`, `username`, `role`) ke dalam `UserContext` yang bersifat `RequestScoped`.
+- **Mekanisme:** Mengekstrak header `Authorization: Bearer <token>`, memvalidasi signature menggunakan `jwt.secret`, serta melakukan pengecekan **expiration time (exp)**. Jika token expired, request akan langsung ditolak dengan status 401 (HTTP) atau UNAUTHENTICATED (gRPC).
 - **Usage:** `UserContext` dapat di-inject ke service manapun untuk mendapatkan informasi user yang sedang login tanpa perlu parsing ulang token di layer domain.
 
 ### 2. Security Context & Tracing Propagation
@@ -37,6 +37,12 @@ Service ini mengimplementasikan standarisasi keamanan dan tracing yang kompatibe
 ## 🏗 Architecture & Standardization
 - **Pattern:** API/Domain/Infrastructure (Konsisten dengan struktur microservice Golang).
 - **Standardization:** Response Envelope `WebResponse<T>`, Pagination `PagedResponse<T>`, Global Exception Handling, dan Logging AOP via `@Logged`.
+
+## 🚀 Native Image Support (GraalVM)
+Service ini dikonfigurasi agar dapat dikompilasi menjadi *native executable*:
+- **Reflection:** Menggunakan `@RegisterForReflection` pada layer API gRPC untuk memastikan service tetap terdeteksi saat di-run sebagai native.
+- **Resources:** Konfigurasi di `application.properties` memastikan file `.proto` dan *descriptors* disertakan dalam binary.
+- **Reflection Service:** gRPC Reflection diaktifkan (`quarkus.grpc.server.enable-reflection-service=true`) agar tools seperti `grpcurl` tetap bisa melakukan introspeksi service.
 
 ## 📂 Struktur Folder
 Proyek ini mengikuti pola `API/Domain/Infrastructure` untuk memudahkan navigasi kode dan menjaga konsistensi dengan microservices berbasis Golang:
@@ -63,7 +69,7 @@ src/main/java/com/pconk/procurement/
 - Flyway Migration
 
 ## 📡 gRPC Server
-Service ini menjalankan gRPC Server pada port `9001` (default dev) atau sesuai konfigurasi.
+Service ini menjalankan gRPC Server pada port `50054` (default dev) atau sesuai konfigurasi.
 - **Protobuf:** Definisi file `.proto` berada di module shared/proto.
 - **Service:** `ProcurementService` menyediakan method untuk integrasi antar service.
 
@@ -75,13 +81,14 @@ grpcurl -plaintext \
   -d '{"po_id": 1}' \
   -H "Authorization: Bearer <YOUR_TOKEN>" \
   -H "X-Request-ID: $(uuidgen)" \
-  localhost:9001 com.pconk.procurement.v1.ProcurementService/UpdateStatusToReceived
+  localhost:50054 com.pconk.procurement.v1.ProcurementService/UpdateStatusToReceived
 ```
 
 **Status Code Mapping:**
 - `OK (0)`: Sukses update dan trigger sinkronisasi stok.
 - `NOT_FOUND (5)`: ID Purchase Order tidak ditemukan.
 - `FAILED_PRECONDITION (9)`: Business logic error (misal: status sudah RECEIVED).
+- `UNAUTHENTICATED (16)`: JWT expired atau signature tidak valid.
 
 ## 📦 Cara Menjalankan
 

@@ -61,6 +61,13 @@ public class GrpcHeaderInterceptor {
                         String payload = new String(Base64.getUrlDecoder().decode(parts[1]), StandardCharsets.UTF_8);
                         JsonNode claims = objectMapper.readTree(payload);
                         
+                        // Validasi Expiration (exp)
+                        long currentTimeSeconds = System.currentTimeMillis() / 1000;
+                        if (claims.has("exp") && claims.get("exp").asLong() < currentTimeSeconds) {
+                            call.close(Status.UNAUTHENTICATED.withDescription("JWT Token has expired"), new Metadata());
+                            return new ServerCall.Listener<ReqT>() {};
+                        }
+
                         String userId = claims.has("user_id") ? claims.get("user_id").asText() : null;
                         String username = claims.has("username") ? claims.get("username").asText() : null;
                         String role = claims.has("role") ? claims.get("role").asText() : null;
